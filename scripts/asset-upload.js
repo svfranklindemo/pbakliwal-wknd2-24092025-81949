@@ -56,15 +56,15 @@ const extractIds = (paramValue) => {
     return null;
 };
 
-// Function to fetch project data from API
-const fetchProjectData = async (projectId) => {
+// Function to fetch demo data from API
+const fetchDemoData = async (projectId,demoId) => {
     try {
         const token = getAuthToken();
         if (!token) {
             throw new Error('Authentication token not found');
         }
 
-        const response = await fetch(`${demoPilotDomain}/projects/${projectId}`, {
+        const response = await fetch(`${demoPilotDomain}/projects/${projectId}/demos/${demoId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -75,7 +75,7 @@ const fetchProjectData = async (projectId) => {
         }
         return await response.json();
     } catch (error) {
-        console.error('Error fetching project data:', error);
+        console.error('Error fetching demo data:', error);
         throw error;
     }
 };
@@ -225,10 +225,7 @@ const getPayloadUpdates = async () => {
             return null;
         }
 
-        const projectData = await fetchProjectData(ids.projectId);
-        
-        // Find the specific demo in the project data
-        const targetDemo = projectData.demos.find(demo => demo.id === ids.demoId);
+        const targetDemo = await fetchDemoData(ids.projectId,ids.demoId);
         
         if (!targetDemo) {
             console.error('Demo not found in project data');
