@@ -183,28 +183,6 @@ const getResourceType = (pathToModify) => {
   }
 };
 
-// Function to find path to modify based on edit ID
-const getPathToModify = (editId) => {
-  try {
-    // Find element with matching data-demo-copilot-edit-id
-    const element = document.querySelector(
-      `[data-demo-copilot-edit-id="${editId}"]`
-    );
-    if (!element) {
-      console.warn(
-        `No element found with data-demo-copilot-edit-id="${editId}"`
-      );
-      return null;
-    }
-
-    // Return the ID of the element
-    return element.id || null;
-  } catch (error) {
-    console.error("Error finding path to modify:", error);
-    return null;
-  }
-};
-
 // Function to process edits and create payload updates
 const processEdits = async (projectId, demoId) => {
   try {
@@ -230,12 +208,19 @@ const processEdits = async (projectId, demoId) => {
     return edits.map((edit) => {
       const pathToModify = edit.elementRef.id;
       if (!pathToModify) {
-        return null;
+        return; // Skip this object if pathToModify is not present
       }
 
       const resource = getResourceType(pathToModify);
       return {
-        importedUrl: edit.sourceUrl || "",
+        importedUrl:
+          demoPilotDomain +
+          "/projects/" +
+          projectId +
+          "/assets/" +
+          edit.newValue.assetId +
+          "/proxy?assetName=" +
+          edit.newValue.assetName,
         pathToModify: pathToModify || edit.xPath || "",
         name: edit.newValue.assetId || "",
         originalEdit: edit,
